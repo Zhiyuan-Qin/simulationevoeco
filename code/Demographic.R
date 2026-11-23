@@ -22,8 +22,18 @@ multinomial <- function(pool, probs) {
   }
   death = 1 - sum(probs) # death prob
   probd = c(probs, death) # merge them
-  x = as.vector(rmultinom(n=11, pool, probd)) # sample
+  x = as.vector(rmultinom(n=1, pool, probd)) # sample (n=11 in the original was a typo, confirmed by the lecturer)
   return(x[1:length(probs)])
+}
+
+sum_vect <- function(x, y) {
+  # add two vectors element-wise, padding the shorter one with zeros
+  if (length(x) < length(y)) {
+    x <- c(x, rep(0, length(y) - length(x)))
+  } else if (length(y) < length(x)) {
+    y <- c(y, rep(0, length(x) - length(y)))
+  }
+  return(x + y)
 }
 
 survival_maturation <- function(state,growth_matrix){
