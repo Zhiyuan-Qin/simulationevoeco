@@ -77,3 +77,19 @@ Entries are in chronological order. Each entry is pushed when written and is not
   - Claude provided a short implementation of `sum_vect()`. I went through it line by line before using it, and I will write the tests myself.
   - Asked Claude to suggest a structure for this README and to polish the wording of this entry.
 - **Next:** apply the fixes, write `code/test_demographic.R`, then start the Part 1 panel a time series.
+
+### 2026-11-23 14：10
+
+**Fixes and tests completed**
+- Applied the two fixes planned yesterday in `code/Demographic.R`: changed `rmultinom(n=11)` to `n=1` (with a comment explaining why) and added `sum_vect()`. Checked in R that `sum_vect(c(1, 3), c(1, 0, 5, 2))` returns `2 3 5 2`.
+- Wrote `code/test_demographic.R`. `sum_vect()` is tested against exact values (x shorter, y shorter, equal length). `multinomial()` is tested on properties that must always hold: output length 4, no negative values, total ≤ pool size, and zero counts where the probability is zero. All tests pass.
+- Committed the fixes and the tests separately from the original file, so the Git history shows exactly what I changed.
+
+**What I learned about testing stochastic code**
+- `set.seed()` fixes the starting point of R's pseudo-random number generator, so the same seed and the same calls always give identical results. I used this to test reproducibility. This will matter for the HPC runs (`set.seed(iter)`) and for Part 2, which must reproduce exactly the same figure every time.
+- At first I thought that without resetting the seed the two results "will be different". In fact they are only *likely* to differ: with small integer counts they can match by chance. So a test asserting that they differ would be unreliable (a "flaky" test). Tests for stochastic functions should only check properties that are guaranteed.
+
+**AI usage**
+- Claude gave me the test file skeleton and the `sum_vect()` tests; I wrote the five `multinomial()` tests myself. I needed an explanation of `set.seed()` for the reproducibility test, and Claude pointed out the flaw in my answer about unseeded runs.
+
+**Next:** Part 1 panel a — local time series comparing deterministic and stochastic runs from 100 and 10 adults.
