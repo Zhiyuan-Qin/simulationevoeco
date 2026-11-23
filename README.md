@@ -78,7 +78,7 @@ Entries are in chronological order. Each entry is pushed when written and is not
   - Asked Claude to suggest a structure for this README and to polish the wording of this entry.
 - **Next:** apply the fixes, write `code/test_demographic.R`, then start the Part 1 panel a time series.
 
-### 2026-11-23 14：10
+### 2026-11-23 14:10
 
 **Fixes and tests completed**
 - Applied the two fixes planned yesterday in `code/Demographic.R`: changed `rmultinom(n=11)` to `n=1` (with a comment explaining why) and added `sum_vect()`. Checked in R that `sum_vect(c(1, 3), c(1, 0, 5, 2))` returns `2 3 5 2`.
@@ -93,3 +93,19 @@ Entries are in chronological order. Each entry is pushed when written and is not
 - Claude gave me the test file skeleton and the `sum_vect()` tests; I wrote the five `multinomial()` tests myself. I needed an explanation of `set.seed()` for the reproducibility test, and Claude pointed out the flaw in my answer about unseeded runs.
 
 **Next:** Part 1 panel a — local time series comparing deterministic and stochastic runs from 100 and 10 adults.
+
+### 2026-11-23 14:39
+
+**Plan for Part 1 panel a (before writing the code)**
+- Script `code/part1_panel_a.R`: source `Demographic.R`, define the matrices and clutch distribution, set a fixed seed, then for each initial state (`c(0,0,0,100)` and `c(0,0,0,10)`) run the deterministic model once and the stochastic model 5 times for 24 steps.
+- Plot: time 0–24 on the x-axis, total population on a log y-axis; red = 100 adults, blue = 10 adults; solid = deterministic, dashed = stochastic. Save as a PDF in `results/`.
+- Number of stochastic runs: about 5 per initial condition. Too many lines would make the plot unreadable; too few would not show how variable the runs are. I will use a fixed seed and not re-run to pick a "nice-looking" set.
+
+**Predictions (before running)**
+- Stochastic runs should fluctuate around the deterministic line, because the stochastic model has the same expected values.
+- Runs starting from 10 adults should spread out much more than runs from 100, because random births and deaths matter more in a small population.
+- Because the deterministic model is linear, the run from 10 adults should be exactly 1/10 of the run from 100, so the two solid lines should be parallel on the log scale.
+- Some runs from 10 adults may go extinct within 24 steps. Zero cannot be shown on a log axis, so I plan to replace 0 with `NA` (so the line stops) and mark the extinction with a symbol, rather than plotting log(N+1), which would change the meaning of the axis.
+
+**AI usage**
+- Discussed these predictions with Claude. My own answers were that the 10-adult runs would spread more, that extinction was possible and needed separate handling, and that about 5 runs was a sensible number. Claude explained why (relative fluctuations scale roughly as 1/√N), pointed out the parallel deterministic lines, and compared three ways to handle zeros on a log axis.
