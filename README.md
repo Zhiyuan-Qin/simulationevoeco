@@ -109,3 +109,26 @@ Entries are in chronological order. Each entry is pushed when written and is not
 
 **AI usage**
 - Discussed these predictions with Claude. My own answers were that the 10-adult runs would spread more, that extinction was possible and needed separate handling, and that about 5 runs was a sensible number. Claude explained why (relative fluctuations scale roughly as 1/√N), pointed out the parallel deterministic lines, and compared three ways to handle zeros on a log axis.
+
+### 2026-11-23 19:00
+
+**Part 1 panel a — results vs predictions**
+- Wrote `code/part1_panel_a.R` and saved the figure to `results/part1_panel_a.pdf`.
+- Checked the deterministic runs before plotting: 100 → 300 → 276 and 10 → 30 → 27.6, and `det_small / det_large` is exactly 0.1 at every step. This confirms my prediction that the two deterministic lines are parallel on the log scale.
+- As predicted, the stochastic runs fluctuate around the deterministic lines, and the runs from 10 adults spread out much more (39 to 126 at step 24, compared with 46.6 for the deterministic run) than the runs from 100 adults.
+- None of the 5 runs from 10 adults went extinct with `set.seed(1)`. Five runs are far too few to estimate how likely extinction is; panel b, with 800 runs per initial size on the HPC, will answer that. I did not change the seed to force an extinction into the figure. The code still replaces zeros with `NA`, so it will handle extinctions if they occur.
+- Unexpected result: the deterministic population falls from 300 to about 195 over steps 1–4, even though the long-run growth rate is above 1 (λ ≈ 1.039). This is a transient effect. Starting with only adults produces a pulse of newborns at step 1, many of which die before maturing, so the population declines until the stage structure settles and steady growth begins. This could be a good finding to discuss in the report.
+
+**Figure quality**
+- First version: the legend covered the red lines. I raised the upper y-limit (×4 rather than a fixed amount, because on a log scale multiplying gives a constant visual gap), added a title and horizontal axis labels (`las = 1`).
+- Learned to use `pdf()` and `dev.off()`, and to check the saved PDF rather than the RStudio plot pane, because the size and layout differ.
+- To do when combining with panel b: replace "Panel a)" in the title with a corner label, and possibly reduce the empty space above the lines.
+
+**Note**
+- In an earlier commit today I also corrected a typo (a full-width colon) in the heading of the 14:10 entry; no content was changed. From now on I will not edit earlier entries.
+
+**AI usage**
+- Claude provided the plotting skeleton; I filled in the blue lines and the second deterministic line. I fixed a missing-comma syntax error after Claude explained how to read R's "unexpected symbol" message.
+- Claude explained the transient decline (stable stage distribution) after I had noticed the numbers going down.
+
+**Next:** Part 1 panel b — write and test locally the simulation script for the HPC.
