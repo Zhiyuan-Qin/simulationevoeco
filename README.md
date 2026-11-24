@@ -132,3 +132,24 @@ Entries are in chronological order. Each entry is pushed when written and is not
 - Claude explained the transient decline (stable stage distribution) after I had noticed the numbers going down.
 
 **Next:** Part 1 panel b — write and test locally the simulation script for the HPC.
+
+### 2026-11-24 20:16
+
+**Plan for Part 1 panel b (before writing the code)**
+- Script `code/part1_hpc.R`, written so it can run both locally and on the HPC:
+  - clear the workspace, source `Demographic.R`, define the matrices and clutch distribution;
+  - read `iter` from `PBS_ARRAY_INDEX`; if it is `NA` (running locally), set `iter <- 1`;
+  - `set.seed(iter)` so that each of the 20 jobs uses a different seed. If every job used the same seed, the 20 jobs would produce identical results, so the 800 "runs" per initial size would really be only 40 distinct runs repeated 20 times;
+  - for each initial size (3, 10, 30, 100 adults), run 40 stochastic simulations of 120 steps;
+  - save the results to `part1_hpc_output_<iter>.rda`.
+- What to save: the full time series of every run, not only the final size. This allows me to look at *when* extinctions happen as well as whether they happen. Size estimate: 160 runs × 121 values × 8 bytes ≈ 155 KB per job, about 3 MB for all 20 jobs, so well under the 10 MB limit.
+- Local testing: first run with a small number of simulations to catch bugs quickly; then run one full job locally with `system.time()` to estimate how long each HPC job will take.
+- Afterwards, a separate script will read the 20 RDA files and compute the proportion of runs that are extinct at step 120 for each initial size.
+
+**Predictions (before running)**
+- Extinction probability will decrease as initial size increases.
+- With only 3 adults it should be substantial (perhaps tens of percent), smaller with 10, and close to zero with 30 and 100.
+- Most extinctions should happen early: once the population has grown, λ > 1 makes it increasingly safe.
+
+**AI usage**
+- Discussed the design with Claude. My answers: extinction decreases with size and happens early; save full series vs final value as a trade-off; test locally on fewer runs first; different seeds because the same seed gives identical results. Claude corrected my first prediction (I had said all four would be near 0), pointed out that memory is not the real reason for a small local test (speed of debugging is), and estimated the RDA size.
