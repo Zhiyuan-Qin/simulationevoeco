@@ -153,3 +153,23 @@ Entries are in chronological order. Each entry is pushed when written and is not
 
 **AI usage**
 - Discussed the design with Claude. My answers: extinction decreases with size and happens early; save full series vs final value as a trade-off; test locally on fewer runs first; different seeds because the same seed gives identical results. Claude corrected my first prediction (I had said all four would be near 0), pointed out that memory is not the real reason for a small local test (speed of debugging is), and estimated the RDA size.
+
+### 2026-11-25 22:47
+
+**Part 1 panel b — writing and testing the HPC script locally**
+- Wrote `code/part1_hpc.R`. It detects whether it is running on the cluster (`PBS_ARRAY_INDEX` set) or locally (`NA`, so `iter` is set to 1), and chooses the path to `Demographic.R` and the output folder accordingly.
+- First test with `n_sims <- 2` to find bugs quickly. Two bugs: in both, the code ran without errors but the results were wrong. Both were found by checking that step 0 of every run equals the initial size:
+  1. I passed the whole vector `initial_sizes` as the initial state, so every run started at 143 (= 3 + 10 + 30 + 100).
+  2. I then used `initial_sizes[j]`, but `j` counts the runs, not the initial sizes, so runs started at 3 and 10 whatever the intended size. It was also a single number instead of a 4-stage state vector. The fix was `c(0, 0, 0, size)`.
+- Lesson: code that runs without errors can still be wrong, so I will keep checking simple facts about the output (such as the value at step 0).
+- Then ran one full job locally (40 runs × 4 sizes × 120 steps): about 5 seconds with `system.time()`, so a 30-minute walltime on the HPC will be plenty.
+- Proportion extinct at step 120 in this single local job: 0.400 (3 adults), 0.075 (10), 0 (30), 0 (100). This matches my revised prediction, but 40 runs per size is too few for a reliable estimate. The 800 runs from the HPC will give the real answer.
+- Found a file-name clash: the local test (`iter = 1`) would have written the same file as HPC job 1. The local test now saves to `data/part1_local_test.rda`, which is git-ignored.
+- Removed the temporary `n_sims <- 2` line rather than leaving commented-out code.
+
+**AI usage**
+- Claude provided the script skeleton; I wrote the simulation loop. Claude spotted from my `str()` output that runs started at 143 and hinted at the cause. I attempted a fix (`initial_sizes[j]`), which was still wrong, and Claude explained how to read `str()` output column by column and why `j` was the wrong index.
+- Claude also pointed out the file-name clash and suggested the `.gitignore` entry.
+- Learned that the HPC path uses my short username without "@".
+
+**Next:** write the `.sh` job script, log in to the HPC, and run a first test there.
