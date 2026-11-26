@@ -173,3 +173,27 @@ Entries are in chronological order. Each entry is pushed when written and is not
 - Learned that the HPC path uses my short username without "@".
 
 **Next:** write the `.sh` job script, log in to the HPC, and run a first test there.
+
+### 2026-11-26 22:34
+
+**First run on the HPC**
+- Logged in to `login.cx3.hpc.imperial.ac.uk` for the first time. `echo $HOME` gave `/rds/general/user/zq725/home`, which matches the path to `Demographic.R` in `part1_hpc.R`.
+- `module spider R/4.4.1-gfbf-2023b` showed that `tools/prod` must be loaded before R. Neither the classmate's Canvas post nor the course handouts mention this. Tested `module load tools/prod` then `module load R/4.4.1-gfbf-2023b` on the login node (`R --version` gave 4.4.1) and added both lines to `code/part1_hpc.sh`. The HPC runs R 4.4.1, while I use 4.6.1 locally; my code only uses base R, so this should not matter.
+- Adapted the shell script from the Practical 1 template: replaced `anaconda3/personal` with the two `module load` lines, set walltime to 30 minutes (one job takes ~5 s locally), and removed the `mv` line because jobs now run in `$HOME`.
+- Uploaded `Demographic.R`, `part1_hpc.R` and `part1_hpc.sh` with `scp`, then submitted a small test of 2 jobs (`qsub -J 1-2`) before the full 20.
+- Job status went Q (queued) → B (array begun) → X (sub-job finished). X only means "finished", not "succeeded", so I checked the output of sub-job 1: the `.o` file starts with "R is about to run" and ends with "R has finished running", the `.e` file is empty (0 bytes), and `part1_hpc_output_1.rda` (~40 KB) appeared in `$HOME`. Since the script saves with no folder prefix on the cluster, this shows the job's working directory is `$HOME`.
+
+**Code for panel b (written while waiting)**
+- Wrote `code/part1_panel_b.R`, which reads all HPC result files and estimates the extinction probability for each initial size.
+- Files are found with `list.files(pattern = "^part1_hpc_output_.*\\.rda$")`. My first idea, `"\\.rda$"`, would also have matched the local test file and mixed it into the results.
+- The script adds up the number of extinctions and the number of runs across all files, then divides. This gives the same answer as averaging per-job proportions only when every job has the same number of runs; adding counts is correct in all cases. It also prints how many files were found, so a missing job will be noticed.
+- Plan for the figure: log-scaled x-axis (3, 10, 30, 100 are roughly evenly spaced on a log scale), y-axis from 0 to 1 on a linear scale (probabilities of 0 cannot be shown on a log axis), and points with 95% confidence intervals rather than a line, because there are no results between the four sizes and each value is an estimate from 800 runs.
+
+**Problem: no access from home**
+- The HPC can only be reached from the Imperial network. Off campus, students need VPN or Unified Access (Zscaler), which must be requested from the ICT Service Desk. I have applied for Zscaler. The test results stay on the HPC until I can download them.
+
+**AI usage**
+- Claude provided the shell script with an explanation of each line and spotted the `tools/prod` requirement in the `module spider` output. It explained the PBS status codes (B, X), how to check `.o` and `.e` files, and why the remote path in `scp` must be quoted in zsh.
+- For panel b, Claude made my file pattern more specific, confirmed my answer about adding counts and explained when it matters, and suggested points with confidence intervals instead of my proposed line plot.
+
+**Next:** download the 2 test results on campus, test `part1_panel_b.R` on them (expect 2 files and 80 runs per size), then submit the full 20 jobs.
