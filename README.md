@@ -198,3 +198,32 @@ Entries are in chronological order. Each entry is pushed when written and is not
 - For panel b, Claude made my file pattern more specific, confirmed my answer about adding counts and explained when it matters, and suggested points with confidence intervals instead of my proposed line plot.
 
 **Next:** download the 2 test results on campus, test `part1_panel_b.R` on them (expect 2 files and 80 runs per size), then submit the full 20 jobs.
+
+### 2026-11-27 20:48
+
+**Part 1 panel b — full HPC run**
+- Zscaler access was approved, so the HPC can now be used off campus.
+- Confirmed that test sub-job 2 had finished (empty `.e` file, `.o` file the same size as sub-job 1), downloaded both test results with `scp` and ran `part1_panel_b.R` on them: "Found 2 result files", 80 runs per size.
+- Both test jobs gave exactly the same number of extinctions (16, 3, 0, 0), which could have meant the seeds were not working. `identical(r1, r2)` returned `FALSE`, so the two jobs contain different simulations and the matching counts were a coincidence. Job 1 also gave the same result as my local test, as expected, because both use `set.seed(1)`.
+- Submitted the full array job (`qsub -J 1-20`, job 42037). All 20 sub-jobs ran at the same time and finished within a few minutes. Checked: 20 RDA files, 20 `.e` files, and `find ... -size +0` found no non-empty `.e` file.
+- Downloaded the 20 RDA files (812 KB in total) to `data/`, and 3 sample `.e` and `.o` files to `data/hpc_logs/`, and committed them.
+
+**Results (800 runs per initial size)**
+- Extinctions by step 120: 325/800 (3 adults), 50/800 (10), 1/800 (30), 0/800 (100).
+- This matches my prediction: extinction probability decreases with initial size, is substantial (about 41%) with 3 adults and close to zero with 30 and 100. With 30 adults it is not exactly zero: one extinction in 800 runs, which the 40-run local test could not have shown.
+- 95% confidence intervals use the exact binomial (Clopper–Pearson) method via `binom.test()`. The usual normal-approximation formula gives an interval of [0, 0] when there are no extinctions and a negative lower limit for 1/800. With 0/800 the exact upper limit is about 0.0046, so the data cannot rule out a small extinction probability with 100 adults.
+
+**Part 1 figure**
+- Plotted panel b: log-scaled x-axis with ticks at 3, 10, 30 and 100, y-axis from 0 to 1, points with 95% CI error bars, no connecting line.
+- Combined both panels into one figure. The panel scripts no longer save their own PDF; the new `code/part1_figure.R` opens one PDF, splits it into two panels with `par(mfrow = c(1, 2))`, sources both panel scripts and saves `results/part1_figure.pdf`. The old single-panel `results/part1_panel_a.pdf` was removed because no script produces it any more; it remains in the git history.
+- Kept a title on each panel and added bold corner labels "a" and "b" with `mtext()`.
+- Decided to keep the y-axis of panel b at 0–1, the full range of a probability, even though this leaves empty space and the intervals for 30 and 100 adults are too small to see. Their values will be given in the caption instead.
+- Updated the README ("How to run" table and the location of the HPC logs).
+
+**AI usage**
+- Claude gave the commands for checking the jobs and downloading the files (including the `[eo]` and `[123]` patterns in `scp`), and explained each one.
+- Claude noticed that the two test jobs had identical counts and suggested the `identical()` check.
+- Claude explained why the normal-approximation interval fails at 0 and 1 extinctions and gave the `binom.test()` code. It also gave the plotting code for panel b, the `mtext()` corner labels and the `part1_figure.R` script, with line-by-line explanations; I typed and tested them.
+- Claude proposed two ways to combine the panels; I chose the simpler one. Claude suggested removing the old PDF with `git rm`. I decided to keep the y-axis at 0–1 after Claude set out the trade-off between 0–1 and 0–0.5.
+
+**Next:** write the Part 1 caption (100 words) and explanation (150 words), then start Part 2.
