@@ -56,11 +56,10 @@ y_limits <- c(min(all_values, na.rm = TRUE), max(all_values, na.rm = TRUE) * 4)
 red_light  <- adjustcolor("red",  alpha.f = 0.5)
 blue_light <- adjustcolor("blue", alpha.f = 0.5)
 
-pdf("results/part1_panel_a.pdf", width = 7, height = 5)
 # empty plot with log y-axis
 plot(NA, xlim = range(time), ylim = y_limits, log = "y", las = 1,
      xlab = "Time step", ylab = "Total population size (log scale)",
-     main = "Panel a) Deterministic vs stochastic dynamics")
+     main = "Deterministic vs stochastic dynamics")
 
 # stochastic runs: dashed
 for (i in 1:n_runs) {
@@ -77,4 +76,4 @@ legend("topleft",
                   "10 adults, deterministic",  "10 adults, stochastic"),
        col = c("red", red_light, "blue", blue_light),
        lty = c(1, 2, 1, 2), lwd = c(2, 1, 2, 1), bty = "n")
-dev.off()
+mtext("a", side = 3, line = 1.5, adj = -0.12, font = 2, cex = 1.5)

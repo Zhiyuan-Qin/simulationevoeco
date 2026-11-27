@@ -34,9 +34,10 @@ source("code/<script_name>.R")
 | Part | Script | What it does |
 |---|---|---|
 | 1 | `code/Demographic.R` | Model functions (provided by the lecturer, with fixes — see diary) |
-| 1 | TODO | Panel a: local time-series simulation |
-| 1 | TODO | Panel b: HPC simulation script + `.sh` job script |
-| 1 | TODO | Reads HPC output and plots the extinction probabilities |
+| 1 | `code/part1_panel_a.R` | Panel a: local time-series simulation (deterministic vs stochastic) |
+| 1 | `code/part1_hpc.R`, `code/part1_hpc.sh` | Panel b: simulation script and PBS array job script (`qsub -J 1-20`) for the HPC |
+| 1 | `code/part1_panel_b.R` | Reads the HPC output in `data/`, estimates extinction probabilities with 95% CIs, plots panel b |
+| 1 | `code/part1_figure.R` | **Reproduces the Part 1 figure**: runs both panel scripts and saves `results/part1_figure.pdf` |
 | 2 | TODO | Neutral model; reproduces the Part 2 figure in under one minute |
 | 3 | TODO | Microproject |
 
@@ -49,7 +50,7 @@ Tests live in `code/` (e.g. `code/test_demographic.R`) and can be run with `sour
 
 ## HPC runs
 
-The shell scripts and three sample `.e` and `.o` files from each cluster run are kept in `code/` (TODO: confirm final location).
+The shell script is in `code/`. The results of the 20 array jobs (job 42037) are in `data/part1_hpc_output_*.rda`, and three sample `.e` and `.o` files are in `data/hpc_logs/`.
 
 ## Use of AI
 

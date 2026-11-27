@@ -20,4 +20,17 @@ for (f in files) {
 }
 
 p_extinct <- n_extinct / n_total
-print(data.frame(initial_size = sizes, n_extinct, n_total, p_extinct))
+ci <- sapply(1:4, function(k) binom.test(n_extinct[k], n_total[k])$conf.int)
+ci_lower <- ci[1, ]
+ci_upper <- ci[2, ]
+print(data.frame(initial_size = sizes, n_extinct, n_total, p_extinct, ci_lower, ci_upper))
+
+## ---- plot ----
+plot(sizes, p_extinct, log = "x", xlim = c(2, 150), ylim = c(0, 1),
+     pch = 19, las = 1, xaxt = "n",
+     xlab = "Initial number of adults (log scale)",
+     ylab = "Probability of extinction by step 120",
+     main = "Extinction probability vs initial size")
+axis(1, at = sizes)
+arrows(sizes, ci_lower, sizes, ci_upper, angle = 90, code = 3, length = 0.05)
+mtext("b", side = 3, line = 1.5, adj = -0.12, font = 2, cex = 1.5)
